@@ -3,7 +3,8 @@ const { exec } = require('child_process');
 const executePy = (filepath, inputPath) => { 
     return new Promise((resolve, reject) => {
         
-        const command = `python3"${filepath}" < "${inputPath}"`; 
+        // FIXED: Added a space after python3
+        const command = `python3 "${filepath}" < "${inputPath}"`; 
         
         exec(command, (error, stdout, stderr) => {
             if (error) {

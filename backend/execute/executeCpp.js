@@ -1,0 +1,31 @@
+const { exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const outputPath = path.join(__dirname, '../outputs');
+
+if (!fs.existsSync(outputPath)) {
+    fs.mkdirSync(outputPath, { recursive: true });
+}
+
+const executeCpp = (filepath, inputPath) => { // <-- ADDED inputPath
+    const jobId = path.basename(filepath).split('.')[0];
+    const outPath = path.join(outputPath, `${jobId}.exe`); 
+
+    return new Promise((resolve, reject) => {
+        // Compile the code, AND THEN run it while feeding the input file
+        const command = `g++ ${filepath} -o ${outPath} && ${outPath} < ${inputPath}`;
+        
+        exec(command, (error, stdout, stderr) => {
+            if (error) {
+                reject({ error, stderr });
+            }
+            if (stderr) {
+                reject(stderr);
+            }
+            resolve(stdout);
+        });
+    });
+};
+
+module.exports = { executeCpp };

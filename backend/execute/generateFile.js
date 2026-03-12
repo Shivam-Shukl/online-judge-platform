@@ -13,14 +13,11 @@ if (!fs.existsSync(dirCodes)) {
 const generateFile = async (format, content) => {
     // Generate a unique ID for the file
     const jobId = uuid();
-    // Create the filename (e.g., '1234-abcd.cpp' or '1234-abcd.py')
     const filename = `${jobId}.${format}`;
-    // Create the full path where the file will be saved
     const filepath = path.join(dirCodes, filename);
     
-    // Write the actual code content into the file physically on your hard drive
-    await fs.writeFileSync(filepath, content);
-    
+    // Write the code to the file
+    fs.writeFileSync(filepath, content);
     return filepath;
 };
 

@@ -5,6 +5,8 @@ import axios from 'axios';
 
 export default function Workspace() {
   const { id } = useParams(); 
+  console.log("VITE URL IS:", import.meta.env.VITE_BACKEND_URL);
+  
   const [problem, setProblem] = useState(null); 
   
   const [language, setLanguage] = useState('cpp');

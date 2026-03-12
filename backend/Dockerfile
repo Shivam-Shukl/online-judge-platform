@@ -1,5 +1,5 @@
-# 1. Use an official Node.js image as the base
-FROM node:18
+# 1. Use a newer official Node.js image to fix Mongoose compatibility (Node 20+)
+FROM node:20
 
 # 2. Update the system and install GCC (for C++) and Python3
 RUN apt-get update && apt-get install -y \

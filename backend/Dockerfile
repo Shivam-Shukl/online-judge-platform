@@ -5,6 +5,7 @@ FROM node:20
 RUN apt-get update && apt-get install -y \
     g++ \
     python3 \
+    default-jdk \
     && rm -rf /var/lib/apt/lists/*
 
 # 3. Create the app directory

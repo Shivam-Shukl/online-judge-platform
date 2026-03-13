@@ -5,6 +5,7 @@ import Workspace from './pages/Workspace';
 import Contribute from './pages/Contribute';
 import Login from './pages/Login';       // <-- IMPORT
 import Register from './pages/Register'; // <-- IMPORT
+import Playground from './pages/Playground';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/contribute" element={<Contribute />} /> 
           <Route path="/login" element={<Login />} />       {/* <-- ADD ROUTE */}
           <Route path="/register" element={<Register />} /> {/* <-- ADD ROUTE */}
+          <Route path="/compiler" element={<Playground />} />
         </Routes>
       </div>
     </BrowserRouter>

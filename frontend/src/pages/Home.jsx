@@ -85,6 +85,9 @@ export default function Home() {
           >
             🔐 Login / Sign Up
           </Link>
+          <Link to="/compiler" style={{ backgroundColor: '#ff9800', color: 'white', padding: '15px 30px', fontSize: '1.1rem', textDecoration: 'none', borderRadius: '5px', fontWeight: 'bold' }}>
+            Open Compiler
+          </Link>
         </div>
       </div>
 

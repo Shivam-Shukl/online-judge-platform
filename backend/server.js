@@ -13,6 +13,7 @@ const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
 const mongoose = require("mongoose");
+
 require("dotenv").config();
 
 // ===============================
@@ -22,6 +23,7 @@ const { generateFile } = require("./execute/generateFile");
 const { generateInputFile } = require("./execute/generateInputFile"); // FIXED: Added missing import
 const { executeCpp } = require("./execute/executeCpp");
 const { executePy } = require("./execute/executePy");
+const { executeJava } = require("./execute/executeJava");
 const Problem = require("./models/Problem");
 const User = require("./models/User");             
 const bcrypt = require("bcryptjs");                
@@ -57,30 +59,48 @@ mongoose
 // ===============================
 
 // Basic Run Route (without test cases)
+// Basic Run Route (Playground with Custom Input)
 app.post("/run", async (req, res) => {
-  const { language = "cpp", code } = req.body;
+  // Now accepting 'input' from the frontend!
+  const { language = "cpp", code, input = "" } = req.body;
+  
   if (!code) return res.status(400).json({ success: false, error: "Empty code body!" });
 
   let filepath;
+  let inputPath;
   try {
-    filepath = await generateFile(language, code);
+    // Generate the custom input file
+    inputPath = await generateInputFile(input);
     let output;
-    if (language === "cpp") output = await executeCpp(filepath);
-    else if (language === "py") output = await executePy(filepath);
-    else return res.status(400).json({ success: false, error: "Unsupported language!" });
 
-    res.json({ success: true, filepath, output });
+    if (language === "cpp") {
+      filepath = await generateFile(language, code);
+      output = await executeCpp(filepath, inputPath);
+    } else if (language === "py") {
+      filepath = await generateFile(language, code);
+      output = await executePy(filepath, inputPath);
+    } else if (language === "java") {
+      // Java handles its own file generation internally because of the class name rule
+      output = await executeJava(code, inputPath);
+    } else {
+      return res.status(400).json({ success: false, error: "Unsupported language!" });
+    }
+
+    res.json({ success: true, output });
   } catch (err) {
+    console.error("RUN ROUTE CRASH:", err);
     res.status(500).json({ success: false, error: err.message || err.stderr || err });
   } finally {
-    if (filepath) {
-      fs.unlink(filepath, (err) => { if (err) console.error(`Error deleting ${filepath}`, err); });
+    // Cleanup files
+    if (inputPath && fs.existsSync(inputPath)) fs.unlinkSync(inputPath);
+    if (filepath && fs.existsSync(filepath)) {
+      fs.unlinkSync(filepath);
       if (language === "cpp") {
         const jobId = path.basename(filepath).split(".")[0];
         const outPath = path.join(__dirname, "execute", "outputs", `${jobId}.out`);
         const exePath = path.join(__dirname, "execute", "outputs", `${jobId}.exe`);
-        if (fs.existsSync(outPath)) fs.unlink(outPath, () => {});
-        if (fs.existsSync(exePath)) fs.unlink(exePath, () => {});
+        if (fs.existsSync(outPath)) fs.unlinkSync(outPath);
+        if (fs.existsSync(exePath)) fs.unlinkSync(exePath);
       }
     }
   }

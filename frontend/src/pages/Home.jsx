@@ -145,7 +145,7 @@ export default function Home() {
             }}
           >
             {serverStatus === "idle" && "🔌 Connect to Backend Server"}
-            {serverStatus === "checking" && "⏳ Waking Server... (Takes ~50s)"}
+            {serverStatus === "checking" && "⏳ Waking Server... (Takes ~2min)"}
             {serverStatus === "online" && "✅ Server is Online"}
             {serverStatus === "error" && "❌ Connection Failed - Try Again"}
           </button>

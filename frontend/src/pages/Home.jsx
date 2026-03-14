@@ -1,6 +1,27 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 export default function Home() {
+  const [serverStatus, setServerStatus] = useState("idle"); // 'idle' | 'checking' | 'online' | 'error'
+
+  const checkServerStatus = async () => {
+    setServerStatus("checking");
+    try {
+      // Hitting the problems endpoint to wake up the Render server
+      await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/problems`);
+      setServerStatus("online");
+    } catch (error) {
+      // If we get a response (even a 404 or 500), the server is awake. 
+      // If we get no response, it's a network error/timeout.
+      if (error.response) {
+        setServerStatus("online");
+      } else {
+        setServerStatus("error");
+      }
+    }
+  };
+
   return (
     <div
       style={{
@@ -39,7 +60,7 @@ export default function Home() {
             lineHeight: "1.6",
           }}
         >
-          Practice coding problems, write solutions in C++ or Python,
+          Practice coding problems, write solutions in C++, Python, or Java,
           and get instant feedback from our automated judging system.
           Improve your problem-solving skills and prepare for technical interviews.
         </p>
@@ -85,9 +106,49 @@ export default function Home() {
           >
             🔐 Login / Sign Up
           </Link>
-          <Link to="/compiler" style={{ backgroundColor: '#ff9800', color: 'white', padding: '15px 30px', fontSize: '1.1rem', textDecoration: 'none', borderRadius: '5px', fontWeight: 'bold' }}>
-            Open Compiler
+
+          <Link
+            to="/compiler"
+            style={{
+              backgroundColor: "#ff9800",
+              color: "white",
+              padding: "15px 30px",
+              fontSize: "1.1rem",
+              textDecoration: "none",
+              borderRadius: "10px",
+              fontWeight: "bold",
+              boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+            }}
+          >
+            💻 Open Compiler
           </Link>
+        </div>
+
+        {/* SERVER WAKE UP SECTION */}
+        <div style={{ marginTop: "40px" }}>
+          <button
+            onClick={checkServerStatus}
+            disabled={serverStatus === "checking" || serverStatus === "online"}
+            style={{
+              backgroundColor: 
+                serverStatus === "online" ? "#16a34a" : 
+                serverStatus === "error" ? "#dc2626" : 
+                "#475569",
+              color: "white",
+              padding: "10px 20px",
+              fontSize: "1rem",
+              border: "none",
+              borderRadius: "8px",
+              cursor: serverStatus === "checking" || serverStatus === "online" ? "not-allowed" : "pointer",
+              fontWeight: "bold",
+              transition: "background-color 0.3s",
+            }}
+          >
+            {serverStatus === "idle" && "🔌 Connect to Backend Server"}
+            {serverStatus === "checking" && "⏳ Waking Server... (Takes ~50s)"}
+            {serverStatus === "online" && "✅ Server is Online"}
+            {serverStatus === "error" && "❌ Connection Failed - Try Again"}
+          </button>
         </div>
       </div>
 
@@ -123,7 +184,7 @@ export default function Home() {
 
           <div style={cardStyle}>
             <h3>💻 Multiple Languages</h3>
-            <p>Write solutions in C++ and Python using our online coding environment.</p>
+            <p>Write solutions in C++, Python, and Java using our online coding environment.</p>
           </div>
 
           <div style={cardStyle}>
@@ -170,7 +231,7 @@ export default function Home() {
           </div>
 
           <div>
-            <h2 style={statStyle}>2</h2>
+            <h2 style={statStyle}>3</h2>
             <p>Languages Supported</p>
           </div>
 
